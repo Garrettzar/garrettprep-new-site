@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GarrettPrep SAT College Fit Calculator</title>
+  <style>
+    :root {
+      --ink: #111111;
+      --paper: #fbfaf5;
+      --card: #ffffff;
+      --muted: #5f6368;
+      --line: #111111;
+      --green: #15803d;
+      --green-bg: #eaf7ee;
+      --red: #b91c1c;
+      --red-bg: #fff0f0;
+      --yellow: #a16207;
+      --yellow-bg: #fff7d6;
+      --blue: #1d4ed8;
+      --blue-bg: #eaf1ff;
+      --shadow: 5px 5px 0 var(--ink);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(21,128,61,0.08), transparent 26rem),
+        radial-gradient(circle at top right, rgba(185,28,28,0.07), transparent 22rem),
+        var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 56px;
+    }
+
+    .marker {
+      border: 3px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      gap: 22px;
+      align-items: stretch;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero:after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -70px;
+      width: 220px;
+      height: 220px;
+      border: 4px dashed rgba(17,17,17,0.18);
+      border-radius: 50%;
+      transform: rotate(-8deg);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      background: var(--yellow-bg);
+      border: 2px solid var(--line);
+      padding: 6px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 4.25rem);
+      line-height: 0.96;
+      margin: 0 0 14px;
+      letter-spacing: -0.06em;
+    }
+
+    .hero p {
+      font-size: 1.08rem;
+      color: #252525;
+      max-width: 760px;
+      margin: 0;
+    }
+
+    .hero-side {
+      border: 3px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      background: linear-gradient(180deg, #fff 0%, #fff7d6 100%);
+      display: grid;
+      gap: 10px;
+      align-content: center;
+      transform: rotate(0.5deg);
+    }
+
+    .hero-stat {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 0;
+      border-bottom: 2px dashed rgba(17,17,17,0.25);
+      font-weight: 800;
+    }
+
+    .hero-stat:last-child { border-bottom: 0; }
+
+    .controls {
+      margin-top: 24px;
+      padding: 22px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    label {
+      font-weight: 800;
+      font-size: 0.92rem;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 13px 12px;
+      border: 3px solid var(--line);
+      border-radius: 13px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-weight: 700;
+      outline: none;
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    input:focus, select:focus {
+      box-shadow: 4px 4px 0 var(--green);
+    }
+
+    .toggle-row {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .scenario-btn, .cta, .mini-btn {
+      border: 3px solid var(--line);
+      border-radius: 999px;
+      background: var(--ink);
+      color: #fff;
+      font: inherit;
+      font-weight: 900;
+      padding: 12px 18px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 rgba(17,17,17,0.25);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .scenario-btn.is-on {
+      background: var(--green);
+    }
+
+    .mini-btn {
+      background: #fff;
+      color: var(--ink);
+      padding: 9px 12px;
+      box-shadow: 2px 2px 0 rgba(17,17,17,0.25);
+      font-size: 0.9rem;
+    }
+
+    .helper {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 650;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .stat-card {
+      padding: 16px;
+      min-height: 120px;
+    }
+
+    .stat-kicker {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 900;
+    }
+
+    .stat-value {
+      font-size: clamp(1.45rem, 3vw, 2.4rem);
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      margin: 8px 0 6px;
+    }
+
+    .stat-sub {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .filters {
+      margin-top: 24px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1.5fr 0.8fr 0.8fr;
+      gap: 14px;
+      align-items: end;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      margin: 24px 0 14px;
+    }
+
+    .results-header h2 {
+      font-size: clamp(1.55rem, 2.7vw, 2.6rem);
+      letter-spacing: -0.05em;
+      margin: 0;
+    }
+
+    .results-count {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .college-card {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .college-top {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: start;
+    }
+
+    .college-title {
+      margin: 0;
+      font-size: 1.25rem;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    .college-location {
+      color: var(--muted);
+      font-weight: 750;
+      margin-top: 3px;
+      font-size: 0.92rem;
+    }
+
+    .badge {
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-weight: 950;
+      font-size: 0.77rem;
+      white-space: nowrap;
+    }
+
+    .badge.strong { background: var(--green-bg); color: var(--green); }
+    .badge.solid { background: var(--blue-bg); color: var(--blue); }
+    .badge.competitive { background: var(--yellow-bg); color: var(--yellow); }
+    .badge.reach, .badge.high { background: var(--red-bg); color: var(--red); }
+    .badge.limited { background: #f0f0f0; color: #444; }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .metric {
+      border: 2px dashed rgba(17,17,17,0.28);
+      border-radius: 14px;
+      padding: 10px;
+      background: #fffdfa;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-weight: 900;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .metric-value {
+      font-weight: 950;
+      margin-top: 4px;
+      font-size: 1rem;
+    }
+
+    .fit-lines {
+      display: grid;
+      gap: 8px;
+    }
+
+    .fit-line {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 10px;
+      align-items: start;
+      font-weight: 750;
+      font-size: 0.95rem;
+    }
+
+    .fit-line span:first-child {
+      font-weight: 950;
+    }
+
+    .fit-line .good { color: var(--green); }
+    .fit-line .watch { color: var(--yellow); }
+    .fit-line .bad { color: var(--red); }
+
+    .bar {
+      height: 12px;
+      background: #eee;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow: inset 1px 1px 0 rgba(0,0,0,0.12);
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: repeating-linear-gradient(45deg, var(--green), var(--green) 8px, #22c55e 8px, #22c55e 14px);
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    .note {
+      background: #fafafa;
+      border-left: 5px solid var(--ink);
+      padding: 10px 12px;
+      border-radius: 10px;
+      color: #333;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .source-line {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .disclaimer {
+      margin-top: 28px;
+      padding: 20px;
+      background: #fff;
+    }
+
+    .disclaimer h3 {
+      margin: 0 0 8px;
+      letter-spacing: -0.03em;
+    }
+
+    .disclaimer p {
+      margin: 8px 0;
+      color: #303030;
+      font-weight: 700;
+    }
+
+    .cta-box {
+      margin-top: 22px;
+      padding: 22px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--green-bg);
+    }
+
+    .cta-box h3 {
+      margin: 0 0 4px;
+      letter-spacing: -0.04em;
+      font-size: 1.55rem;
+    }
+
+    .cta-box p {
+      margin: 0;
+      color: #26352b;
+      font-weight: 750;
+    }
+
+    .cta {
+      background: var(--green);
+      color: #fff;
+      flex: 0 0 auto;
+    }
+
+    .empty {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-weight: 850;
+    }
+
+    .footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    @media (max-width: 940px) {
+      .hero, .controls-grid, .filters, .stats-grid, .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 22px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .page {
+        width: min(100% - 18px, 1180px);
+        padding-top: 10px;
+      }
+
+      .stats-grid, .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .results-header, .cta-box, .college-top, .toggle-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .badge, .scenario-btn, .cta, .mini-btn {
+        width: 100%;
+      }
+
+      .fit-line {
+        grid-template-columns: 1fr;
+        gap: 2px;
+      }
+
+      .hero-side {
+        transform: none;
+      }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .controls, .filters, .cta-box { display: none; }
+      .marker { box-shadow: none; }
+      .cards { grid-template-columns: 1fr; }
+      .page { width: 100%; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <script id="college-data" type="application/json">[{"high_school":"Wayne Valley","college_name":"Rutgers University-New Brunswick","college_location":"New Brunswick, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":624,"accepted_count":286,"enrolled_count":95,"local_acceptance_rate":0.458,"accepted_sat_low_est":1000,"accepted_sat_high_est":1450,"accepted_gpa_low_est":3.4,"accepted_gpa_high_est":4.3,"sat_profile_label":"Competitive SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers sampled from the visible scattergram broadly span about 1000-1450 SAT and 3.4-4.3 GPA; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Rutgers University-Newark","college_location":"Newark, New Jersey","years_included":"2021-2025","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":43,"accepted_count":28,"enrolled_count":13,"local_acceptance_rate":0.651,"accepted_sat_low_est":900,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.2,"accepted_gpa_high_est":4.5,"sat_profile_label":"Likely safer SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers show a wide SAT spread with high outliers, but the local pattern appears more forgiving than the more selective schools; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Rutgers University-Camden","college_location":"Camden, New Jersey","years_included":null,"source_in_naviance":"College profile > Admissions; no usable aggregate rows","applicants_total":0,"accepted_count":0,"enrolled_count":0,"local_acceptance_rate":null,"accepted_sat_low_est":null,"accepted_sat_high_est":null,"accepted_gpa_low_est":null,"accepted_gpa_high_est":null,"sat_profile_label":"Data too limited","data_quality":"Too small / suppress","notes":"No usable visible application-history rows; detailed score ranges suppressed.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Montclair State University","college_location":"Montclair, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":747,"accepted_count":497,"enrolled_count":186,"local_acceptance_rate":0.665,"accepted_sat_low_est":950,"accepted_sat_high_est":1400,"accepted_gpa_low_est":2.9,"accepted_gpa_high_est":4.1,"sat_profile_label":"Likely safer SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers broadly span about 950-1400 SAT and 2.9-4.1 GPA, with most accepted students appearing in a safer local range; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Ramapo College of New Jersey","college_location":"Mahwah, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":448,"accepted_count":239,"enrolled_count":69,"local_acceptance_rate":0.533,"accepted_sat_low_est":1000,"accepted_sat_high_est":1350,"accepted_gpa_low_est":3.3,"accepted_gpa_high_est":4,"sat_profile_label":"Competitive SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers broadly span about 1000-1350 SAT and 3.3-4.0 GPA; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"William Paterson University","college_location":"Wayne, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":385,"accepted_count":227,"enrolled_count":62,"local_acceptance_rate":0.59,"accepted_sat_low_est":950,"accepted_sat_high_est":1500,"accepted_gpa_low_est":2.5,"accepted_gpa_high_est":4.2,"sat_profile_label":"Likely safer SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers show a broad range, roughly 950-1500 SAT and 2.5-4.2 GPA, with many accepted students in the lower-to-mid SAT bands; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"The College of New Jersey","college_location":"Ewing, New Jersey","years_included":"2021-2025","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":317,"accepted_count":155,"enrolled_count":37,"local_acceptance_rate":0.489,"accepted_sat_low_est":1100,"accepted_sat_high_est":1550,"accepted_gpa_low_est":3.1,"accepted_gpa_high_est":4.3,"sat_profile_label":"Competitive SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers broadly span about 1100-1550 SAT and 3.1-4.3 GPA, with a competitive local profile; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"New Jersey Institute of Technology","college_location":"Newark, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":263,"accepted_count":149,"enrolled_count":46,"local_acceptance_rate":0.567,"accepted_sat_low_est":950,"accepted_sat_high_est":1550,"accepted_gpa_low_est":3.2,"accepted_gpa_high_est":4.5,"sat_profile_label":"Competitive SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers broadly span about 950-1550 SAT and 3.2-4.5 GPA; stronger GPA/SAT combinations appear more common; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Stevens Institute of Technology","college_location":"Hoboken, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":163,"accepted_count":76,"enrolled_count":23,"local_acceptance_rate":0.466,"accepted_sat_low_est":1150,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.6,"accepted_gpa_high_est":4.6,"sat_profile_label":"Reach SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers broadly span about 1150-1600 SAT and 3.6-4.6 GPA, with the accepted cluster skewing high; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Seton Hall University","college_location":"South Orange, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":478,"accepted_count":318,"enrolled_count":41,"local_acceptance_rate":0.665,"accepted_sat_low_est":850,"accepted_sat_high_est":1600,"accepted_gpa_low_est":2.7,"accepted_gpa_high_est":4.3,"sat_profile_label":"Likely safer SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers show a wide range with outliers, but the local pattern appears more forgiving than highly selective schools; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Penn State University","college_location":"University Park, Pennsylvania","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":415,"accepted_count":232,"enrolled_count":38,"local_acceptance_rate":0.559,"accepted_sat_low_est":1000,"accepted_sat_high_est":1550,"accepted_gpa_low_est":3.5,"accepted_gpa_high_est":4.6,"sat_profile_label":"Competitive SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers broadly span about 1000-1550 SAT and 3.5-4.6 GPA, with stronger GPA common among accepted students; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"University of Connecticut","college_location":"Storrs, Connecticut","years_included":"2023-2024","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":57,"accepted_count":34,"enrolled_count":3,"local_acceptance_rate":0.596,"accepted_sat_low_est":950,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.5,"accepted_gpa_high_est":4.6,"sat_profile_label":"Competitive SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers show a broad SAT spread and generally strong GPA, roughly 3.5-4.6; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"University of Delaware","college_location":"Newark, Delaware","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":332,"accepted_count":210,"enrolled_count":34,"local_acceptance_rate":0.633,"accepted_sat_low_est":1000,"accepted_sat_high_est":1500,"accepted_gpa_low_est":3.5,"accepted_gpa_high_est":4.3,"sat_profile_label":"Competitive SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers broadly span about 1000-1500 SAT and 3.5-4.3 GPA; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Quinnipiac University","college_location":"Hamden, Connecticut","years_included":"2022-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":160,"accepted_count":101,"enrolled_count":16,"local_acceptance_rate":0.631,"accepted_sat_low_est":900,"accepted_sat_high_est":1400,"accepted_gpa_low_est":3,"accepted_gpa_high_est":4.2,"sat_profile_label":"Competitive SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers broadly span about 900-1400 SAT and 3.0-4.2 GPA, with overlap across the middle SAT range; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Marist University","college_location":"Poughkeepsie, New York","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":124,"accepted_count":69,"enrolled_count":13,"local_acceptance_rate":0.556,"accepted_sat_low_est":1100,"accepted_sat_high_est":1550,"accepted_gpa_low_est":3.2,"accepted_gpa_high_est":4.3,"sat_profile_label":"Competitive SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers broadly span about 1100-1550 SAT and 3.2-4.3 GPA; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Fordham University","college_location":"Bronx, New York","years_included":"2022-2025","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":73,"accepted_count":32,"enrolled_count":11,"local_acceptance_rate":0.438,"accepted_sat_low_est":1100,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.4,"accepted_gpa_high_est":4.6,"sat_profile_label":"Competitive SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers broadly span about 1100-1600 SAT and 3.4-4.6 GPA; local pattern is competitive and somewhat unpredictable; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Villanova University","college_location":"Villanova, Pennsylvania","years_included":"2021-2025","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":80,"accepted_count":11,"enrolled_count":6,"local_acceptance_rate":0.138,"accepted_sat_low_est":1200,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.9,"accepted_gpa_high_est":4.5,"sat_profile_label":"Reach SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers are sparse but visible and skew high, roughly 1200-1600 SAT and 3.9-4.5 GPA; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Rowan University","college_location":"Glassboro, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":361,"accepted_count":219,"enrolled_count":44,"local_acceptance_rate":0.607,"accepted_sat_low_est":900,"accepted_sat_high_est":1550,"accepted_gpa_low_est":2.4,"accepted_gpa_high_est":4.4,"sat_profile_label":"Likely safer SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers show a broad range, with many accepted students in safer-to-mid SAT bands; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Fairleigh Dickinson University","college_location":"Teaneck, New Jersey","years_included":null,"source_in_naviance":"College profile > Admissions; no usable aggregate rows","applicants_total":0,"accepted_count":0,"enrolled_count":0,"local_acceptance_rate":null,"accepted_sat_low_est":null,"accepted_sat_high_est":null,"accepted_gpa_low_est":null,"accepted_gpa_high_est":null,"sat_profile_label":"Data too limited","data_quality":"Too small / suppress","notes":"No usable visible application-history rows; detailed score ranges suppressed.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Monmouth University","college_location":"West Long Branch, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":206,"accepted_count":124,"enrolled_count":11,"local_acceptance_rate":0.602,"accepted_sat_low_est":950,"accepted_sat_high_est":1250,"accepted_gpa_low_est":2.2,"accepted_gpa_high_est":4,"sat_profile_label":"Likely safer SAT fit","data_quality":"Direct Naviance aggregate + scattergram estimate","notes":"Accepted markers broadly span about 950-1250 SAT and 2.2-4.0 GPA, suggesting a safer local SAT profile; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Kean University","college_location":"Union, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":154,"accepted_count":86,"enrolled_count":11,"local_acceptance_rate":0.558,"accepted_sat_low_est":950,"accepted_sat_high_est":1550,"accepted_gpa_low_est":2.4,"accepted_gpa_high_est":4.1,"sat_profile_label":"Likely safer SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 950-1550 SAT with weighted GPA about 2.4-4.1; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Stockton University","college_location":"Galloway, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":70,"accepted_count":36,"enrolled_count":8,"local_acceptance_rate":0.514,"accepted_sat_low_est":1000,"accepted_sat_high_est":1550,"accepted_gpa_low_est":2.8,"accepted_gpa_high_est":4.2,"sat_profile_label":"Competitive SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1000-1550 SAT with weighted GPA about 2.8-4.2; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Rider University","college_location":"Lawrenceville, New Jersey","years_included":"2022-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":38,"accepted_count":24,"enrolled_count":2,"local_acceptance_rate":0.632,"accepted_sat_low_est":1000,"accepted_sat_high_est":1600,"accepted_gpa_low_est":2.3,"accepted_gpa_high_est":4.4,"sat_profile_label":"Competitive SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1000-1600 SAT with weighted GPA about 2.3-4.4; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Caldwell University","college_location":"Caldwell, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":66,"accepted_count":39,"enrolled_count":7,"local_acceptance_rate":0.591,"accepted_sat_low_est":900,"accepted_sat_high_est":1500,"accepted_gpa_low_est":2.7,"accepted_gpa_high_est":4,"sat_profile_label":"Likely safer SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 900-1500 SAT with weighted GPA about 2.7-4; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Drew University","college_location":"Madison, New Jersey","years_included":"2021-2025","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":67,"accepted_count":45,"enrolled_count":10,"local_acceptance_rate":0.672,"accepted_sat_low_est":1050,"accepted_sat_high_est":1500,"accepted_gpa_low_est":3.6,"accepted_gpa_high_est":4.3,"sat_profile_label":"Competitive SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1050-1500 SAT with weighted GPA about 3.6-4.3; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Saint Peter’s University","college_location":"Jersey City, New Jersey","years_included":null,"source_in_naviance":"College profile > Admissions; sparse or no usable local aggregate rows","applicants_total":0,"accepted_count":0,"enrolled_count":0,"local_acceptance_rate":null,"accepted_sat_low_est":null,"accepted_sat_high_est":null,"accepted_gpa_low_est":null,"accepted_gpa_high_est":null,"sat_profile_label":"Data too limited","data_quality":"Too small / suppress","notes":"Too few visible local results to use confidently.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Princeton University","college_location":"Princeton, New Jersey","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":36,"accepted_count":5,"enrolled_count":4,"local_acceptance_rate":0.139,"accepted_sat_low_est":1400,"accepted_sat_high_est":1600,"accepted_gpa_low_est":4.5,"accepted_gpa_high_est":4.7,"sat_profile_label":"Reach SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1400-1600 SAT with weighted GPA about 4.5-4.7; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Columbia University","college_location":"New York, New York","years_included":"2021-2025","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":22,"accepted_count":4,"enrolled_count":2,"local_acceptance_rate":0.182,"accepted_sat_low_est":null,"accepted_sat_high_est":null,"accepted_gpa_low_est":null,"accepted_gpa_high_est":null,"sat_profile_label":"Data too limited","data_quality":"Missing SAT/GPA range","notes":"Aggregate history shows 4 accepted of 22 applicants, but SAT/GPA range could not be estimated safely from the visible scattergram.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"New York University","college_location":"New York, New York","years_included":"2021-2025","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":50,"accepted_count":11,"enrolled_count":5,"local_acceptance_rate":0.22,"accepted_sat_low_est":1250,"accepted_sat_high_est":1550,"accepted_gpa_low_est":3.7,"accepted_gpa_high_est":4.6,"sat_profile_label":"Reach SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1250-1550 SAT with weighted GPA about 3.7-4.6; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Pace University","college_location":"New York City, New York","years_included":"2025-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":17,"accepted_count":10,"enrolled_count":3,"local_acceptance_rate":0.588,"accepted_sat_low_est":950,"accepted_sat_high_est":1600,"accepted_gpa_low_est":2.9,"accepted_gpa_high_est":4.4,"sat_profile_label":"Likely safer SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 950-1600 SAT with weighted GPA about 2.9-4.4; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Hofstra University","college_location":"Hempstead, New York","years_included":"2023-2025","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":42,"accepted_count":28,"enrolled_count":5,"local_acceptance_rate":0.667,"accepted_sat_low_est":950,"accepted_sat_high_est":1500,"accepted_gpa_low_est":2.9,"accepted_gpa_high_est":4.3,"sat_profile_label":"Competitive SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 950-1500 SAT with weighted GPA about 2.9-4.3; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Manhattan University","college_location":"Riverdale, New York","years_included":"2022-2022","source_in_naviance":"College profile > Admissions; sparse or no usable local aggregate rows","applicants_total":1,"accepted_count":2,"enrolled_count":1,"local_acceptance_rate":null,"accepted_sat_low_est":null,"accepted_sat_high_est":null,"accepted_gpa_low_est":null,"accepted_gpa_high_est":null,"sat_profile_label":"Data too limited","data_quality":"Too small / suppress","notes":"Too few visible local results to use confidently.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Iona University","college_location":"New Rochelle, New York","years_included":"2023-2024","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":8,"accepted_count":5,"enrolled_count":2,"local_acceptance_rate":0.625,"accepted_sat_low_est":950,"accepted_sat_high_est":1450,"accepted_gpa_low_est":2,"accepted_gpa_high_est":3.8,"sat_profile_label":"Likely safer SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 950-1450 SAT with weighted GPA about 2-3.8; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Adelphi University","college_location":"Garden City, New York","years_included":"2021-2021","source_in_naviance":"College profile > Admissions; sparse or no usable local aggregate rows","applicants_total":4,"accepted_count":3,"enrolled_count":1,"local_acceptance_rate":null,"accepted_sat_low_est":null,"accepted_sat_high_est":null,"accepted_gpa_low_est":null,"accepted_gpa_high_est":null,"sat_profile_label":"Data too limited","data_quality":"Too small / suppress","notes":"Too few visible local results to use confidently.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Binghamton University","college_location":"Vestal, New York","years_included":"2023-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":29,"accepted_count":15,"enrolled_count":3,"local_acceptance_rate":0.517,"accepted_sat_low_est":1100,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.4,"accepted_gpa_high_est":4.6,"sat_profile_label":"Reach SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1100-1600 SAT with weighted GPA about 3.4-4.6; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Stony Brook University","college_location":"Stony Brook, New York","years_included":"2022-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":32,"accepted_count":24,"enrolled_count":4,"local_acceptance_rate":0.75,"accepted_sat_low_est":1100,"accepted_sat_high_est":1500,"accepted_gpa_low_est":3,"accepted_gpa_high_est":4.2,"sat_profile_label":"Competitive SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1100-1500 SAT with weighted GPA about 3-4.2; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"University at Buffalo","college_location":"Buffalo, New York","years_included":"2022-2022","source_in_naviance":"College profile > Admissions; sparse or no usable local aggregate rows","applicants_total":2,"accepted_count":2,"enrolled_count":1,"local_acceptance_rate":null,"accepted_sat_low_est":null,"accepted_sat_high_est":null,"accepted_gpa_low_est":null,"accepted_gpa_high_est":null,"sat_profile_label":"Data too limited","data_quality":"Too small / suppress","notes":"Too few visible local results to use confidently.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Syracuse University","college_location":"Syracuse, New York","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":73,"accepted_count":36,"enrolled_count":7,"local_acceptance_rate":0.493,"accepted_sat_low_est":1150,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.7,"accepted_gpa_high_est":4.6,"sat_profile_label":"Competitive SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1150-1600 SAT with weighted GPA about 3.7-4.6; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Temple University","college_location":"Philadelphia, Pennsylvania","years_included":"2021-2025","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":53,"accepted_count":33,"enrolled_count":7,"local_acceptance_rate":0.623,"accepted_sat_low_est":1050,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.3,"accepted_gpa_high_est":4.4,"sat_profile_label":"Reach SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1050-1600 SAT with weighted GPA about 3.3-4.4; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Drexel University","college_location":"Philadelphia, Pennsylvania","years_included":"2021-2021","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":18,"accepted_count":15,"enrolled_count":2,"local_acceptance_rate":0.833,"accepted_sat_low_est":1150,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.4,"accepted_gpa_high_est":4.4,"sat_profile_label":"Reach SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1150-1600 SAT with weighted GPA about 3.4-4.4; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"West Chester University","college_location":"West Chester, Pennsylvania","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":20,"accepted_count":14,"enrolled_count":2,"local_acceptance_rate":0.7,"accepted_sat_low_est":1000,"accepted_sat_high_est":1450,"accepted_gpa_low_est":3,"accepted_gpa_high_est":3.8,"sat_profile_label":"Competitive SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1000-1450 SAT with weighted GPA about 3-3.8; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"University of Maryland","college_location":"College Park, Maryland","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":141,"accepted_count":55,"enrolled_count":9,"local_acceptance_rate":0.39,"accepted_sat_low_est":1250,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.8,"accepted_gpa_high_est":4.6,"sat_profile_label":"Reach SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1250-1600 SAT with weighted GPA about 3.8-4.6; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Towson University","college_location":"Towson, Maryland","years_included":"2023-2023","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":10,"accepted_count":5,"enrolled_count":1,"local_acceptance_rate":0.5,"accepted_sat_low_est":950,"accepted_sat_high_est":1450,"accepted_gpa_low_est":3.3,"accepted_gpa_high_est":4,"sat_profile_label":"Competitive SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 950-1450 SAT with weighted GPA about 3.3-4; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Fairfield University","college_location":"Fairfield, Connecticut","years_included":"2021-2024","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":33,"accepted_count":14,"enrolled_count":3,"local_acceptance_rate":0.424,"accepted_sat_low_est":1200,"accepted_sat_high_est":1500,"accepted_gpa_low_est":3.5,"accepted_gpa_high_est":4.1,"sat_profile_label":"Reach SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1200-1500 SAT with weighted GPA about 3.5-4.1; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Sacred Heart University","college_location":"Fairfield, Connecticut","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":138,"accepted_count":78,"enrolled_count":16,"local_acceptance_rate":0.565,"accepted_sat_low_est":1050,"accepted_sat_high_est":1500,"accepted_gpa_low_est":2.6,"accepted_gpa_high_est":4,"sat_profile_label":"Competitive SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1050-1500 SAT with weighted GPA about 2.6-4; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Providence College","college_location":"Providence, Rhode Island","years_included":null,"source_in_naviance":"College profile > Admissions; sparse or no usable local aggregate rows","applicants_total":0,"accepted_count":0,"enrolled_count":0,"local_acceptance_rate":null,"accepted_sat_low_est":null,"accepted_sat_high_est":null,"accepted_gpa_low_est":null,"accepted_gpa_high_est":null,"sat_profile_label":"Data too limited","data_quality":"Too small / suppress","notes":"Too few visible local results to use confidently.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"University of Scranton","college_location":"Scranton, Pennsylvania","years_included":"2021-2025","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":67,"accepted_count":49,"enrolled_count":7,"local_acceptance_rate":0.731,"accepted_sat_low_est":900,"accepted_sat_high_est":1500,"accepted_gpa_low_est":3.1,"accepted_gpa_high_est":3.9,"sat_profile_label":"Competitive SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 900-1500 SAT with weighted GPA about 3.1-3.9; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Loyola University Maryland","college_location":"Baltimore, Maryland","years_included":"2021-2022","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":7,"accepted_count":7,"enrolled_count":2,"local_acceptance_rate":1,"accepted_sat_low_est":1200,"accepted_sat_high_est":1550,"accepted_gpa_low_est":3.2,"accepted_gpa_high_est":4.3,"sat_profile_label":"Competitive SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1200-1550 SAT with weighted GPA about 3.2-4.3; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"James Madison University","college_location":"Harrisonburg, Virginia","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":161,"accepted_count":109,"enrolled_count":30,"local_acceptance_rate":0.677,"accepted_sat_low_est":1050,"accepted_sat_high_est":1450,"accepted_gpa_low_est":3,"accepted_gpa_high_est":4,"sat_profile_label":"Competitive SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1050-1450 SAT with weighted GPA about 3-4; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Virginia Tech","college_location":"Blacksburg, Virginia","years_included":"2021-2025","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":119,"accepted_count":62,"enrolled_count":18,"local_acceptance_rate":0.521,"accepted_sat_low_est":900,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.5,"accepted_gpa_high_est":4.6,"sat_profile_label":"Reach SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 900-1600 SAT with weighted GPA about 3.5-4.6; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Clemson University","college_location":"Clemson, South Carolina","years_included":"2022-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":80,"accepted_count":32,"enrolled_count":7,"local_acceptance_rate":0.4,"accepted_sat_low_est":1150,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.4,"accepted_gpa_high_est":4.6,"sat_profile_label":"Reach SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1150-1600 SAT with weighted GPA about 3.4-4.6; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"University of Miami","college_location":"Coral Gables, Florida","years_included":"2022-2023","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":39,"accepted_count":6,"enrolled_count":2,"local_acceptance_rate":0.154,"accepted_sat_low_est":1050,"accepted_sat_high_est":1600,"accepted_gpa_low_est":3.7,"accepted_gpa_high_est":4.6,"sat_profile_label":"Reach SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1050-1600 SAT with weighted GPA about 3.7-4.6; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Boston University","college_location":"Boston, Massachusetts","years_included":"2021-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":34,"accepted_count":10,"enrolled_count":2,"local_acceptance_rate":0.294,"accepted_sat_low_est":1350,"accepted_sat_high_est":1600,"accepted_gpa_low_est":4,"accepted_gpa_high_est":4.6,"sat_profile_label":"Reach SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1350-1600 SAT with weighted GPA about 4-4.6; no dot tooltips used.","date_collected":"2026-05-15"},{"high_school":"Wayne Valley","college_name":"Northeastern University","college_location":"Boston, Massachusetts","years_included":"2022-2026","source_in_naviance":"College profile > Admissions table + visible scattergram","applicants_total":77,"accepted_count":22,"enrolled_count":8,"local_acceptance_rate":0.286,"accepted_sat_low_est":1200,"accepted_sat_high_est":1550,"accepted_gpa_low_est":4,"accepted_gpa_high_est":4.6,"sat_profile_label":"Reach SAT fit","data_quality":"Estimated from scattergram","notes":"Visible accepted markers broadly span about 1200-1550 SAT with weighted GPA about 4-4.6; no dot tooltips used.","date_collected":"2026-05-15"}]</script>
+
+  <main class="page">
+    <section class="hero marker">
+      <div>
+        <div class="eyebrow">GarrettPrep Local Tool</div>
+        <h1>SAT College Fit Calculator</h1>
+        <p>
+          Compare your SAT score and weighted GPA against recent aggregate Wayne Valley Naviance patterns.
+          Then flip on the +150 scenario to see how a serious SAT plan could change your target list.
+        </p>
+      </div>
+      <aside class="hero-side" aria-label="Local benchmark summary">
+        <div class="hero-stat"><span>Schools loaded</span><strong id="heroSchoolCount">—</strong></div>
+        <div class="hero-stat"><span>Wayne Valley avg SAT</span><strong>1122</strong></div>
+        <div class="hero-stat"><span>NJ avg SAT</span><strong>1049</strong></div>
+        <div class="hero-stat"><span>National avg SAT</span><strong>1029</strong></div>
+      </aside>
+    </section>
+
+    <section class="controls marker" aria-label="Student inputs">
+      <div class="controls-grid">
+        <div>
+          <label for="satInput">Student SAT score</label>
+          <input id="satInput" type="number" min="400" max="1600" step="10" value="1300" />
+        </div>
+        <div>
+          <label for="gpaInput">Weighted GPA</label>
+          <input id="gpaInput" type="number" min="0" max="5" step="0.01" value="3.80" />
+        </div>
+        <div>
+          <label for="collegeSearch">Preferred college search</label>
+          <input id="collegeSearch" type="search" placeholder="Rutgers, NJIT, Boston..." />
+        </div>
+        <div>
+          <label for="fitFilter">Fit filter</label>
+          <select id="fitFilter">
+            <option value="all">All fit levels</option>
+            <option value="Strong Local Fit">Strong Local Fit</option>
+            <option value="Solid Local Fit">Solid Local Fit</option>
+            <option value="Competitive Reach">Competitive Reach</option>
+            <option value="Reach">Reach</option>
+            <option value="High Reach">High Reach</option>
+            <option value="Data Limited">Data Limited</option>
+          </select>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <button id="scenarioToggle" class="scenario-btn" type="button">Show +150 GarrettPrep scenario</button>
+          <button id="resetBtn" class="mini-btn" type="button">Reset sample</button>
+        </div>
+        <div class="helper" id="scenarioNote">Currently using your entered SAT score.</div>
+      </div>
+    </section>
+
+    <section class="stats-grid" aria-label="Summary counts">
+      <div class="stat-card marker">
+        <div class="stat-kicker">Scenario SAT</div>
+        <div class="stat-value" id="scenarioSat">—</div>
+        <div class="stat-sub" id="scenarioSatSub">Current score</div>
+      </div>
+      <div class="stat-card marker">
+        <div class="stat-kicker">Vs. Wayne Valley</div>
+        <div class="stat-value" id="localDelta">—</div>
+        <div class="stat-sub">School SAT average: 1122</div>
+      </div>
+      <div class="stat-card marker">
+        <div class="stat-kicker">Strong/Solid Fits</div>
+        <div class="stat-value" id="strongCount">—</div>
+        <div class="stat-sub">Based on local SAT + GPA patterns</div>
+      </div>
+      <div class="stat-card marker">
+        <div class="stat-kicker">Reach/High Reach</div>
+        <div class="stat-value" id="reachCount">—</div>
+        <div class="stat-sub">May need a stronger total profile</div>
+      </div>
+      <div class="stat-card marker">
+        <div class="stat-kicker">Data Limited</div>
+        <div class="stat-value" id="limitedCount">—</div>
+        <div class="stat-sub">Sparse or missing local data</div>
+      </div>
+    </section>
+
+    <section class="filters marker" aria-label="Sorting controls">
+      <div>
+        <label for="sortSelect">Sort results</label>
+        <select id="sortSelect">
+          <option value="fit">Best fit first</option>
+          <option value="chance">Highest estimated local range</option>
+          <option value="acceptance">Highest local acceptance rate</option>
+          <option value="satgap">Smallest SAT gap</option>
+          <option value="name">College name A-Z</option>
+        </select>
+      </div>
+      <div>
+        <label for="minRate">Minimum local acceptance rate</label>
+        <select id="minRate">
+          <option value="0">Any</option>
+          <option value="0.25">25%+</option>
+          <option value="0.40">40%+</option>
+          <option value="0.55">55%+</option>
+          <option value="0.70">70%+</option>
+        </select>
+      </div>
+      <div>
+        <label for="hideLimited">Data limited schools</label>
+        <select id="hideLimited">
+          <option value="show">Show</option>
+          <option value="hide">Hide</option>
+        </select>
+      </div>
+    </section>
+
+    <div class="results-header">
+      <h2>College Results</h2>
+      <div class="results-count" id="resultsCount">—</div>
+    </div>
+
+    <section id="cards" class="cards" aria-live="polite"></section>
+
+    <section class="disclaimer marker">
+      <h3>Important disclaimer</h3>
+      <p><strong>This tool compares your SAT/GPA to recent aggregate Naviance patterns from Wayne Valley High School. It is not an admissions prediction, guarantee, or official college guidance.</strong></p>
+      <p>The “Estimated Local Range” is a rough comparison range created from local acceptance rate, accepted SAT/GPA estimates, applicant volume, and data quality. It should be used for planning targets, not for claiming exact admissions odds.</p>
+    </section>
+
+    <section class="cta-box marker">
+      <div>
+        <h3>Want help turning this into a target SAT plan?</h3>
+        <p>Book a free GarrettPrep SAT consultation and get a clear score goal for your target schools.</p>
+      </div>
+      <a class="cta" href="https://forms.gle/JvQ1fYBZbEk9jEnH8" target="_blank" rel="noopener">Book Free Consultation →</a>
+    </section>
+
+    <div class="footer">
+      Built for GarrettPrep. Data is embedded from the uploaded “Naviance data for lead magnet” spreadsheet and does not require live Google Sheets access.
+    </div>
+  </main>
+
+  <script>
+    const collegeData = JSON.parse(document.getElementById("college-data").textContent);
+
+    const BENCHMARKS = {
+      wayneValley: 1122,
+      nj: 1049,
+      national: 1029
+    };
+
+    let useScenario = false;
+
+    const $ = (id) => document.getElementById(id);
+
+    const fields = [
+      "satInput", "gpaInput", "collegeSearch", "fitFilter", "sortSelect", "minRate", "hideLimited"
+    ];
+
+    fields.forEach(id => $(id).addEventListener("input", render));
+    fields.forEach(id => $(id).addEventListener("change", render));
+
+    $("scenarioToggle").addEventListener("click", () => {
+      useScenario = !useScenario;
+      $("scenarioToggle").classList.toggle("is-on", useScenario);
+      $("scenarioToggle").textContent = useScenario ? "Using +150 GarrettPrep scenario" : "Show +150 GarrettPrep scenario";
+      render();
+    });
+
+    $("resetBtn").addEventListener("click", () => {
+      $("satInput").value = 1300;
+      $("gpaInput").value = "3.80";
+      $("collegeSearch").value = "";
+      $("fitFilter").value = "all";
+      $("sortSelect").value = "fit";
+      $("minRate").value = "0";
+      $("hideLimited").value = "show";
+      useScenario = false;
+      $("scenarioToggle").classList.remove("is-on");
+      $("scenarioToggle").textContent = "Show +150 GarrettPrep scenario";
+      render();
+    });
+
+    function num(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+
+    function pct(rate) {
+      const n = num(rate);
+      if (n === null) return null;
+      return n <= 1 ? n * 100 : n;
+    }
+
+    function fmtPct(rate) {
+      const p = pct(rate);
+      if (p === null) return "Data limited";
+      return `${Math.round(p * 10) / 10}%`;
+    }
+
+    function fmtRange(low, high, suffix = "") {
+      if (low === null || high === null || low === undefined || high === undefined) return "Data limited";
+      return `${low}${suffix}–${high}${suffix}`;
+    }
+
+    function dataLimited(c) {
+      const quality = String(c.data_quality || "").toLowerCase();
+      return quality.includes("too small") ||
+        quality.includes("missing") ||
+        num(c.accepted_sat_low_est) === null ||
+        num(c.accepted_sat_high_est) === null ||
+        num(c.accepted_gpa_low_est) === null ||
+        num(c.accepted_gpa_high_est) === null ||
+        (num(c.applicants_total) !== null && num(c.applicants_total) < 5);
+    }
+
+    function compareToRange(value, low, high, labelType) {
+      const v = num(value), lo = num(low), hi = num(high);
+      if (v === null || lo === null || hi === null) return labelType === "sat" ? "Data too limited" : "GPA data limited";
+      if (v > hi) return labelType === "sat" ? "Above recent local accepted range" : "GPA above recent local range";
+      if (v >= lo && v <= hi) return labelType === "sat" ? "Within recent local accepted range" : "GPA within recent local range";
+      return labelType === "sat" ? "Below recent local accepted range" : "GPA below recent local range";
+    }
+
+    function componentAdjustment(value, low, high, type) {
+      const v = num(value), lo = num(low), hi = num(high);
+      if (v === null || lo === null || hi === null) return 0;
+      const width = Math.max(hi - lo, type === "sat" ? 100 : 0.25);
+
+      if (v > hi) {
+        const extra = type === "sat" ? Math.min((v - hi) / 100, 2) : Math.min((v - hi) / 0.25, 2);
+        return 14 + extra * 2;
+      }
+
+      if (v >= lo) {
+        const position = (v - lo) / width;
+        return -4 + position * 18;
+      }
+
+      const gap = lo - v;
+      if (type === "sat") {
+        if (gap <= 50) return -8;
+        if (gap <= 100) return -13;
+        if (gap <= 200) return -22;
+        return -33;
+      }
+
+      if (gap <= 0.15) return -8;
+      if (gap <= 0.30) return -13;
+      if (gap <= 0.60) return -23;
+      return -34;
+    }
+
+    function estimatedRange(c, sat, gpa) {
+      if (dataLimited(c)) {
+        return {
+          label: "Data Limited",
+          low: null,
+          high: null,
+          mid: null,
+          text: "Data limited"
+        };
+      }
+
+      const base = pct(c.local_acceptance_rate);
+      const baseRate = base === null ? 35 : base;
+      const satAdj = componentAdjustment(sat, c.accepted_sat_low_est, c.accepted_sat_high_est, "sat");
+      const gpaAdj = componentAdjustment(gpa, c.accepted_gpa_low_est, c.accepted_gpa_high_est, "gpa");
+      const profile = String(c.sat_profile_label || "").toLowerCase();
+      let labelAdj = 0;
+      if (profile.includes("reach")) labelAdj -= 6;
+      if (profile.includes("safer")) labelAdj += 4;
+
+      let mid = baseRate + satAdj + gpaAdj + labelAdj;
+
+      const satStatus = compareToRange(sat, c.accepted_sat_low_est, c.accepted_sat_high_est, "sat");
+      const gpaStatus = compareToRange(gpa, c.accepted_gpa_low_est, c.accepted_gpa_high_est, "gpa");
+
+      if (baseRate < 20 && (satStatus.includes("Below") || gpaStatus.includes("below"))) mid = Math.min(mid, 28);
+      if (baseRate < 25 && satStatus.includes("Below") && gpaStatus.includes("below")) mid = Math.min(mid, 18);
+      if (profile.includes("reach") && (satStatus.includes("Below") || gpaStatus.includes("below"))) mid = Math.min(mid, 35);
+
+      mid = clamp(mid, 3, 94);
+
+      const applicants = num(c.applicants_total) || 0;
+      let spread = 10;
+      if (applicants >= 200) spread = 7;
+      else if (applicants >= 75) spread = 9;
+      else if (applicants >= 25) spread = 12;
+      else spread = 16;
+
+      const quality = String(c.data_quality || "").toLowerCase();
+      if (quality.includes("estimated")) spread += 3;
+      if (quality.includes("direct")) spread -= 1;
+
+      const low = Math.round(clamp(mid - spread, 1, 95));
+      const high = Math.round(clamp(mid + spread, 2, 97));
+
+      let label = "Competitive Reach";
+      if (mid >= 68 && !satStatus.includes("Below") && !gpaStatus.includes("below")) label = "Strong Local Fit";
+      else if (mid >= 50) label = "Solid Local Fit";
+      else if (mid >= 30) label = "Competitive Reach";
+      else if (mid >= 15) label = "Reach";
+      else label = "High Reach";
+
+      return {
+        label,
+        low,
+        high,
+        mid: Math.round(mid),
+        text: `${low}–${high}%`
+      };
+    }
+
+    function statusClass(text) {
+      const s = String(text).toLowerCase();
+      if (s.includes("above") || s.includes("within")) return "good";
+      if (s.includes("limited")) return "";
+      return "bad";
+    }
+
+    function badgeClass(label) {
+      const l = String(label).toLowerCase();
+      if (l.includes("strong")) return "strong";
+      if (l.includes("solid")) return "solid";
+      if (l.includes("competitive")) return "competitive";
+      if (l.includes("high")) return "high";
+      if (l.includes("reach")) return "reach";
+      return "limited";
+    }
+
+    function satGap(c, sat) {
+      if (dataLimited(c)) return 9999;
+      const lo = num(c.accepted_sat_low_est);
+      const hi = num(c.accepted_sat_high_est);
+      if (sat >= lo && sat <= hi) return 0;
+      if (sat < lo) return lo - sat;
+      return sat - hi;
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function makeCard(c, sat, gpa) {
+      const limited = dataLimited(c);
+      const estimate = estimatedRange(c, sat, gpa);
+      const satText = compareToRange(sat, c.accepted_sat_low_est, c.accepted_sat_high_est, "sat");
+      const gpaText = compareToRange(gpa, c.accepted_gpa_low_est, c.accepted_gpa_high_est, "gpa");
+      const barWidth = limited || estimate.high === null ? 0 : clamp(estimate.high, 0, 100);
+      const applicants = num(c.applicants_total);
+      const accepted = num(c.accepted_count);
+      const enrolled = num(c.enrolled_count);
+
+      return `
+        <article class="college-card marker">
+          <div class="college-top">
+            <div>
+              <h3 class="college-title">${escapeHTML(c.college_name)}</h3>
+              <div class="college-location">${escapeHTML(c.college_location || "Location not listed")}</div>
+            </div>
+            <span class="badge ${badgeClass(estimate.label)}">${escapeHTML(estimate.label)}</span>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <div class="metric-label">Estimated Local Range</div>
+              <div class="metric-value">${escapeHTML(estimate.text)}</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Local Acceptance</div>
+              <div class="metric-value">${escapeHTML(fmtPct(c.local_acceptance_rate))}</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Local Sample</div>
+              <div class="metric-value">${applicants ? `${applicants} apps` : "Limited"}</div>
+            </div>
+          </div>
+
+          <div class="bar" aria-label="Estimated local range visual">
+            <div class="bar-fill" style="width:${barWidth}%"></div>
+          </div>
+
+          <div class="fit-lines">
+            <div class="fit-line">
+              <span>SAT</span>
+              <div>
+                <strong class="${statusClass(satText)}">${escapeHTML(satText)}</strong>
+                <div class="helper">Accepted SAT estimate: ${escapeHTML(fmtRange(c.accepted_sat_low_est, c.accepted_sat_high_est))}</div>
+              </div>
+            </div>
+            <div class="fit-line">
+              <span>GPA</span>
+              <div>
+                <strong class="${statusClass(gpaText)}">${escapeHTML(gpaText)}</strong>
+                <div class="helper">Accepted GPA estimate: ${escapeHTML(fmtRange(c.accepted_gpa_low_est, c.accepted_gpa_high_est))}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="note">${escapeHTML(c.notes || "No note available.")}</div>
+          <div class="source-line">
+            ${accepted ? `${accepted} accepted` : "Accepted count limited"}${enrolled ? ` · ${enrolled} enrolled` : ""} · ${escapeHTML(c.years_included || "Years not listed")} · ${escapeHTML(c.data_quality || "Data quality not listed")}
+          </div>
+        </article>
+      `;
+    }
+
+    function render() {
+      const rawSat = clamp(num($("satInput").value) || 0, 400, 1600);
+      const gpa = clamp(num($("gpaInput").value) || 0, 0, 5);
+      const scenarioSat = useScenario ? clamp(rawSat + 150, 400, 1600) : rawSat;
+      const search = $("collegeSearch").value.trim().toLowerCase();
+      const fitFilter = $("fitFilter").value;
+      const sortMode = $("sortSelect").value;
+      const minRate = Number($("minRate").value);
+      const hideLimited = $("hideLimited").value === "hide";
+
+      let evaluated = collegeData.map(c => {
+        const est = estimatedRange(c, scenarioSat, gpa);
+        return { ...c, _estimate: est, _limited: dataLimited(c), _satGap: satGap(c, scenarioSat) };
+      });
+
+      evaluated = evaluated.filter(c => {
+        const matchesSearch = !search ||
+          String(c.college_name || "").toLowerCase().includes(search) ||
+          String(c.college_location || "").toLowerCase().includes(search);
+
+        const matchesFit = fitFilter === "all" || c._estimate.label === fitFilter;
+        const matchesRate = (pct(c.local_acceptance_rate) ?? 0) >= minRate * 100 || (minRate === 0 && pct(c.local_acceptance_rate) === null);
+        const matchesLimited = !hideLimited || !c._limited;
+
+        return matchesSearch && matchesFit && matchesRate && matchesLimited;
+      });
+
+      const rank = {
+        "Strong Local Fit": 1,
+        "Solid Local Fit": 2,
+        "Competitive Reach": 3,
+        "Reach": 4,
+        "High Reach": 5,
+        "Data Limited": 6
+      };
+
+      evaluated.sort((a, b) => {
+        if (sortMode === "name") return String(a.college_name).localeCompare(String(b.college_name));
+        if (sortMode === "chance") return (b._estimate.high ?? -1) - (a._estimate.high ?? -1);
+        if (sortMode === "acceptance") return (pct(b.local_acceptance_rate) ?? -1) - (pct(a.local_acceptance_rate) ?? -1);
+        if (sortMode === "satgap") return a._satGap - b._satGap;
+        return (rank[a._estimate.label] ?? 9) - (rank[b._estimate.label] ?? 9) || (b._estimate.high ?? -1) - (a._estimate.high ?? -1);
+      });
+
+      $("heroSchoolCount").textContent = collegeData.length;
+      $("scenarioSat").textContent = scenarioSat;
+      $("scenarioSatSub").textContent = useScenario ? `+150 scenario from ${rawSat}` : "Current score";
+      $("scenarioNote").textContent = useScenario
+        ? `Showing the GarrettPrep +150 scenario: ${rawSat} → ${scenarioSat}${rawSat + 150 > 1600 ? " (capped at 1600)" : ""}.`
+        : "Currently using your entered SAT score.";
+
+      const delta = scenarioSat - BENCHMARKS.wayneValley;
+      $("localDelta").textContent = `${delta >= 0 ? "+" : ""}${delta}`;
+      $("localDelta").style.color = delta >= 0 ? "var(--green)" : "var(--red)";
+
+      const allEvaluated = collegeData.map(c => ({...c, _estimate: estimatedRange(c, scenarioSat, gpa), _limited: dataLimited(c)}));
+      const strong = allEvaluated.filter(c => ["Strong Local Fit", "Solid Local Fit"].includes(c._estimate.label)).length;
+      const reach = allEvaluated.filter(c => ["Reach", "High Reach", "Competitive Reach"].includes(c._estimate.label)).length;
+      const limited = allEvaluated.filter(c => c._limited).length;
+
+      $("strongCount").textContent = strong;
+      $("reachCount").textContent = reach;
+      $("limitedCount").textContent = limited;
+      $("resultsCount").textContent = `${evaluated.length} result${evaluated.length === 1 ? "" : "s"} shown`;
+
+      $("cards").innerHTML = evaluated.length
+        ? evaluated.map(c => makeCard(c, scenarioSat, gpa)).join("")
+        : `<div class="empty marker">No colleges match those filters. Try clearing the search or showing data-limited schools.</div>`;
+    }
+
+    render();
+  </script>
+</body>
+</html>
