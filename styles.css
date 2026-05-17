@@ -1082,3 +1082,18 @@ p {
     gap: 22px;
   }
 }
+
+@media (max-width: 900px) {
+  .has-mobile-menu .nav-links .nav-cta {
+    background: var(--red);
+    color: var(--white);
+    text-align: center;
+    border-color: var(--black);
+  }
+
+  .has-mobile-menu .nav-links .nav-cta.active {
+    background: var(--red);
+    color: var(--white);
+    border-color: var(--black);
+  }
+}
